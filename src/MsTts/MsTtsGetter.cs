@@ -4,9 +4,6 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Caching;
-using System.Windows.Input;
-using WebSocketSharp;
 
 namespace MsTtsForBiliLiveDm.MsTts
 {
