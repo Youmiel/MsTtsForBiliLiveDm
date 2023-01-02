@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MsTtsForBiliLiveDm.Utils
@@ -13,5 +14,13 @@ namespace MsTtsForBiliLiveDm.Utils
         public delegate void LogMethod(string content);
 
         public static LogMethod LogContent { get; set; }
+        public static LogMethod DebugContent { get; set; }
+
+        public static void RunInSTAThread(ThreadStart task)
+        {
+            Thread thread = new Thread(task);
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+        }
     }
 }

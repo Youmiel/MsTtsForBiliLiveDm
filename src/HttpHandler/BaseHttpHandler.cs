@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MsTtsForBiliLiveDm.Utils;
+using System;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MsTtsForBiliDanmaku.HttpHandler
@@ -9,9 +11,11 @@ namespace MsTtsForBiliDanmaku.HttpHandler
         public delegate void ContextHandleMethod(HttpListenerContext context);
         public delegate void RequestHandleMethod(HttpListenerRequest request, HttpListenerResponse response);
 
-        private volatile Task listenTask = null;
+        private volatile Thread listenThread = null;
         private volatile bool running = false;
 
+        protected int port;
+        protected string contextRoot;
         protected HttpListener httpListener = new HttpListener();
         protected ContextHandleMethod contextHandle = null;
         protected RequestHandleMethod requestHandle = null;
@@ -19,6 +23,9 @@ namespace MsTtsForBiliDanmaku.HttpHandler
         //public Task GetListenTask => this.listenTask;
 
         public bool IsRunning => this.running;
+        public int Port { get => this.port; }
+        public string ContextRoot { get => this.contextRoot; }
+
         public ContextHandleMethod ContextHandle { get => this.contextHandle; set => this.contextHandle = value; }
         public RequestHandleMethod RequestHandle { get => this.requestHandle; set => this.requestHandle = value; }
 
@@ -27,20 +34,26 @@ namespace MsTtsForBiliDanmaku.HttpHandler
             this.httpListener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
             if (contextRoot.Length > 0 && !contextRoot.EndsWith("/"))
                 contextRoot += "/";
-            this.httpListener.Prefixes.Add(string.Format("http://+:{0}/{1}", port, contextRoot));
+            this.port = port;
+            this.contextRoot = contextRoot;
+            this.httpListener.Prefixes.Add(string.Format("http://localhost:{0}/{1}", port, contextRoot));
         }
 
-        public Task Start()
+        public Thread Start()
         {
-            if (this.listenTask != null) return this.listenTask;
+            if (this.listenThread != null && this.running)
+                return this.listenThread;
+
             this.httpListener.Start();
             this.running = true;
-            this.listenTask = Task.Run(() =>
+            this.listenThread = new Thread(() =>
             {
                 this.Listen();
+                Util.LogContent(Thread.CurrentThread.Name + "listen stop");
             });
+            this.listenThread.Start();
 
-            return this.listenTask;
+            return this.listenThread;
         }
 
         private void Listen()
@@ -54,11 +67,18 @@ namespace MsTtsForBiliDanmaku.HttpHandler
 
             void ContextGetEnd(IAsyncResult asyncResult)
             {
-                var context = this.httpListener.EndGetContext(asyncResult);
-                this.Handle(context);
+                try
+                {
+                    HttpListenerContext context = this.httpListener.EndGetContext(asyncResult);
+                    this.Handle(context);
+                }
+                catch (Exception e)
+                {
+                    Util.LogContent(e.ToString());
+                }
             }
         }
- 
+
         protected void Handle(HttpListenerContext context)
         {
             if (this.contextHandle != null) this.contextHandle(context);
@@ -69,17 +89,38 @@ namespace MsTtsForBiliDanmaku.HttpHandler
             if (this.requestHandle != null) this.requestHandle(request, response);
         }
 
-        public async Task Stop()
+        public Thread Stop()
         {
+            Thread oldThread = this.listenThread;
             this.running = false;
-            await this.listenTask;
-            this.listenTask = null;
+            this.httpListener.Abort();
+            if (this.listenThread != null)
+            {
+                this.listenThread.Abort();
+                this.listenThread = null;
+            }
+
+            return oldThread;
         }
 
         public void StopAndWait()
         {
-            Task task = this.Stop();
-            task.Wait();
+            Thread oldThread = this.Stop();
+            oldThread.Join();
         }
+
+        //public async Task Stop()
+        //{
+        //    this.running = false;
+        //    this.httpListener.Stop();  // 我搞不懂为啥这插件不让我关listener, 一关就炸
+        //    await this.listenTask;
+        //    this.listenTask = null;
+        //}
+
+        //public void StopAndWait()
+        //{
+        //    Task task = this.Stop();
+        //    task.Wait();
+        //}
     }
 }

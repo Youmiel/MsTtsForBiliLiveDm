@@ -15,6 +15,8 @@ namespace MsTtsForBiliLiveDm.MsTts
 
         private string voiceType;
 
+        public string VoiceType { get => this.voiceType; set => this.voiceType = value; }
+
         public MsTtsGetter() : this(MsVoiceType.XiaoxiaoNeural) { }
 
         public MsTtsGetter(string voiceType)

@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("MsTtsForBiliDanmaku")]
+[assembly: AssemblyTitle("MsTtsForBiliLiveDm")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MsTtsForBiliDanmaku")]
-[assembly: AssemblyCopyright("Copyright © Youmiel 2022")]
+[assembly: AssemblyProduct("MsTtsForBiliLiveDm")]
+[assembly: AssemblyCopyright("Copyright © Youmiel 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

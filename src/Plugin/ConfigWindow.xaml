@@ -1,0 +1,27 @@
+﻿<Window x:Name="PanelBase" x:Class="MsTtsForBiliLiveDm.Plugin.ConfigWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MsTtsForBiliLiveDm.Plugin"
+             mc:Ignorable="d" Width="400" Height="270" Background="#FFFCFCFC" HorizontalAlignment="Left" VerticalAlignment="Top" ResizeMode="NoResize">
+    <Grid Height="230" VerticalAlignment="Center" HorizontalAlignment="Left" Width="400" Margin="0,0,0,6">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="231*"/>
+            <ColumnDefinition Width="169*"/>
+        </Grid.ColumnDefinitions>
+        <Label x:Name="PortLabel" Content="端口号" Height="26" Margin="50,68,121,136" Width="60" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5"/>
+        <Label x:Name="VoiceTypeLabel" Content="语音" Height="26" Margin="50,120,121,84" Width="60" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5"/>
+        <TextBox x:Name="PortText" Height="26" MaxLines="1" MaxLength="5" FontSize="14" Width="220" Margin="130,68,50,136" VerticalContentAlignment="Center" KeyDown="PortText_KeyDown" Grid.ColumnSpan="2">
+            <TextBox.Style>
+                <Style/>
+            </TextBox.Style>
+        </TextBox>
+        <ComboBox x:Name="VoiceTypeBox" Height="26" Margin="130,120,50,84" Width="220" VerticalContentAlignment="Center" AutomationProperties.Name="" Text="" Grid.ColumnSpan="2">
+            <ComboBoxItem Content="&lt;无&gt;"/>
+        </ComboBox>
+        <Button x:Name="SaveButton" Content="保存" Height="32" Margin="49,160,40,38" Width="80" Click="SaveButton_Click" FontSize="14" IsDefault="True" Grid.Column="1"/>
+        <Button x:Name="CancelButton" Content="取消" Height="32" Margin="180,160,140,38" Width="80" Click="CancelButton_Click" FontSize="14" Grid.ColumnSpan="2" IsCancel="True"/>
+
+    </Grid>
+</Window>

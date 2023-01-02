@@ -1,6 +1,7 @@
 ﻿using MsTtsForBiliDanmaku.HttpHandler;
 using MsTtsForBiliLiveDm.MsTts;
 using MsTtsForBiliLiveDm.Utils;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
 using System.Text;
@@ -11,6 +12,9 @@ namespace MsTtsForBiliLiveDm.HttpHandler
     public class TtsHandler : BaseHttpHandler
     {
         private MsTtsGetter ttsGetter;
+
+        public MsTtsGetter TTSGetter => this.ttsGetter;
+
         public TtsHandler(string contextRoot, int port = 8080) : base(contextRoot, port)
         {
             this.RequestHandle = this.HandleTtsRequest;
@@ -20,11 +24,11 @@ namespace MsTtsForBiliLiveDm.HttpHandler
         {
             NameValueCollection urlParameters = HttpUtility.ParseQueryString(request.Url.Query, Encoding.UTF8);
             //NameValueCollection urlParameters = request.QueryString;
-            string danmakuText = urlParameters["text"];
+            string danmakuText = urlParameters.Get("text");
 
             if (danmakuText != null)
             {
-                Util.LogContent("Received text: " + danmakuText);
+                Util.DebugContent("Received text: " + danmakuText);
 
                 response.StatusCode = 200;
                 response.ContentType = "audio/mpeg";
