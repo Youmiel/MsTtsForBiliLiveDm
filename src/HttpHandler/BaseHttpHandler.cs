@@ -49,7 +49,6 @@ namespace MsTtsForBiliDanmaku.HttpHandler
             this.listenThread = new Thread(() =>
             {
                 this.Listen();
-                Util.LogContent(Thread.CurrentThread.Name + "listen stop");
             });
             this.listenThread.Start();
 

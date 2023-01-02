@@ -18,6 +18,8 @@ namespace MsTtsForBiliLiveDm.Plugin
     {
         private static readonly bool DISABLE = false;
 
+        private static readonly string REPOSITORY_LINK = "https://github.com/Youmiel/MsTtsForBiliLiveDm";
+
         private PluginConfig config = null;
         private ConfigWindow configWindow = null;
         private TtsHandler ttsHandler = null;
@@ -59,6 +61,8 @@ namespace MsTtsForBiliLiveDm.Plugin
             //    Util.LogContent("window inited!");
             //    cw.ShowDialog();
             //});
+            this.Log($"你正在使用的是 {this.PluginVer} 版本的 {this.PluginName}, 项目仓库: {REPOSITORY_LINK}. 如果你遇到了任何使用问题, 欢迎前往反馈.");
+
             this.LoadConfig();
         }
 
@@ -74,8 +78,8 @@ namespace MsTtsForBiliLiveDm.Plugin
 
         private void ApplyConfig(PluginConfig config)
         {
-            Util.LogContent("Port: " + config.Port);
-            Util.LogContent("Type: " + config.VoiceType);
+            Util.DebugContent("Port: " + config.Port);
+            Util.DebugContent("VoiceType: " + config.VoiceType);
 
             if (this.ttsHandler == null)
                 this.ttsHandler = new TtsHandler("", config.Port);
