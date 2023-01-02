@@ -1,4 +1,5 @@
 ﻿using MsTtsForBiliLiveDm.HttpHandler;
+using MsTtsForBiliLiveDm.MsTts;
 using MsTtsForBiliLiveDm.Plugin;
 using MsTtsForBiliLiveDm.Utils;
 using System;
@@ -57,17 +58,19 @@ namespace MsTtsForBiliLiveDm
                     this.ttsHandler.Start();
                 }
             }
-
-            this.ttsHandler.TTSGetter.VoiceType = config.VoiceType;
+            
+            MsTtsGetter ttsGetter = this.ttsHandler.TTSGetter;
+            ttsGetter.VoiceType = config.VoiceType;
+            ttsGetter.Rate = config.Rate;
+            ttsGetter.Pitch = config.Pitch;
         }
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            this.ttsHandler = new TtsHandler("", this.config.Port);
-            this.ttsHandler.TTSGetter.VoiceType = this.config.VoiceType;
+            this.ApplyConfig(this.config);
 
-            ttsHandler.Start();
+            this.ttsHandler.Start();
         }
 
         protected override void OnExit(ExitEventArgs e)

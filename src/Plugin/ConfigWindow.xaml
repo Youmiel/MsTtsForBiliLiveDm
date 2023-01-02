@@ -4,24 +4,31 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MsTtsForBiliLiveDm.Plugin"
-             mc:Ignorable="d" Width="400" Height="270" Background="#FFFCFCFC" HorizontalAlignment="Left" VerticalAlignment="Top" ResizeMode="NoResize">
-    <Grid Height="230" VerticalAlignment="Center" HorizontalAlignment="Left" Width="400" Margin="0,0,0,6">
+             mc:Ignorable="d" Width="400" Height="319" Background="#FFFCFCFC" HorizontalAlignment="Left" VerticalAlignment="Top" ResizeMode="NoResize">
+    <Grid HorizontalAlignment="Center" Width="400" Height="284" VerticalAlignment="Bottom">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="231*"/>
-            <ColumnDefinition Width="169*"/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Label x:Name="PortLabel" Content="端口号" Height="26" Margin="50,68,121,136" Width="60" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5"/>
-        <Label x:Name="VoiceTypeLabel" Content="语音" Height="26" Margin="50,120,121,84" Width="60" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5"/>
-        <TextBox x:Name="PortText" Height="26" MaxLines="1" MaxLength="5" FontSize="14" Width="220" Margin="130,68,50,136" VerticalContentAlignment="Center" KeyDown="PortText_KeyDown" Grid.ColumnSpan="2">
+        <Label x:Name="PortLabel" Content="端口号" Height="26" Margin="50,38,290,220" Width="60" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5" RenderTransformOrigin="0.519,0.055"/>
+        <Label x:Name="VoiceTypeLabel" Content="语音" Height="26" Margin="50,82,290,176" Width="60" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5"/>
+        <TextBox x:Name="PortText" Height="26" MaxLines="1" MaxLength="5" FontSize="14" Width="220" Margin="130,38,50,220" VerticalContentAlignment="Center" KeyDown="PortText_KeyDown" TabIndex="0">
             <TextBox.Style>
                 <Style/>
             </TextBox.Style>
         </TextBox>
-        <ComboBox x:Name="VoiceTypeBox" Height="26" Margin="130,120,50,84" Width="220" VerticalContentAlignment="Center" AutomationProperties.Name="" Text="" Grid.ColumnSpan="2">
+        <ComboBox x:Name="VoiceTypeBox" Height="26" Margin="130,82,50,176" Width="220" VerticalContentAlignment="Center" AutomationProperties.Name="" Text="" TabIndex="1">
             <ComboBoxItem Content="&lt;无&gt;"/>
         </ComboBox>
-        <Button x:Name="SaveButton" Content="保存" Height="32" Margin="49,160,40,38" Width="80" Click="SaveButton_Click" FontSize="14" IsDefault="True" Grid.Column="1"/>
-        <Button x:Name="CancelButton" Content="取消" Height="32" Margin="180,160,140,38" Width="80" Click="CancelButton_Click" FontSize="14" Grid.ColumnSpan="2" IsCancel="True"/>
+        <Button x:Name="SaveButton" Content="保存" Height="32" Margin="280,222,40,30" Width="80" Click="SaveButton_Click" FontSize="14" IsDefault="True" TabIndex="7"/>
+        <Button x:Name="CancelButton" Content="取消" Height="32" Margin="180,222,140,30" Width="80" Click="CancelButton_Click" FontSize="14" IsCancel="True" TabIndex="6"/>
+        <Label x:Name="RateLabel" Content="语速" Height="26" Margin="50,126,320,132" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5"/>
+        <Label x:Name="PitchLabel" Content="语调" Height="26" Margin="50,170,320,88" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5"/>
+        <Label x:Name="RateLabelPercent" Content="%" Height="26" Margin="145,126,235,132" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5"/>
+        <Label x:Name="PitchLabelPercent" Content="%" Height="26" Margin="145,170,235,88" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5"/>
+        <TextBox x:Name="RateText" HorizontalAlignment="Left" Height="26" Margin="90,126,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="50" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" MaxLines="1" MaxLength="4" KeyDown="RateText_KeyDown" Padding="5,0,5,0" TabIndex="2"/>
+        <TextBox x:Name="PitchText" HorizontalAlignment="Left" Height="26" Margin="90,170,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="50" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" MaxLines="1" MaxLength="3" KeyDown="PitchText_KeyDown" Padding="5,0,5,0" TabIndex="4"/>
+        <Slider x:Name="RateSlider" HorizontalAlignment="Left" Margin="170,130,0,0" VerticalAlignment="Top" Width="180" Maximum="200" Minimum="-100" ValueChanged="RateSlider_ValueChanged" TabIndex="3"/>
+        <Slider x:Name="PitchSlider" HorizontalAlignment="Left" Margin="170,174,0,0" VerticalAlignment="Top" Width="180" Maximum="50" Minimum="-50" ValueChanged="PitchSlider_ValueChanged" TabIndex="5"/>
 
     </Grid>
 </Window>

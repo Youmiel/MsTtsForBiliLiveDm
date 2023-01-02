@@ -117,6 +117,8 @@ namespace MsTtsForBiliLiveDm.Plugin
         {
             this.PortText.Text = config.Port.ToString();
             this.VoiceTypeBox.SelectedItem = config.VoiceType;
+            this.RateSlider.Value = config.Rate;
+            this.PitchSlider.Value = config.Pitch;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -126,6 +128,8 @@ namespace MsTtsForBiliLiveDm.Plugin
             {
                 this.config.Port = inputPort;
                 this.config.VoiceType = (string)this.VoiceTypeBox.SelectedItem;
+                this.config.Rate = (int)this.RateSlider.Value;
+                this.config.Pitch = (int)this.PitchSlider.Value;
                 this.config.SaveAsync();
             }
             if (this.configApplyAsync != null)
@@ -141,14 +145,30 @@ namespace MsTtsForBiliLiveDm.Plugin
 
         private void PortText_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key >= Key.D0 && e.Key <= Key.D9)
-                return;
-            if (e.Key == Key.Back || e.Key == Key.Delete)
-                return;
-            if (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
-                return;
+            Util.LimitKeyToNumbers(sender, e);
+        }
 
-            e.Handled = true;
+        private void RateText_KeyDown(object sender, KeyEventArgs e)
+        {
+            Util.SyncTextToSlider(this.RateText, this.RateSlider,
+                (int num) => Util.Clamp(num, (int)this.RateSlider.Minimum, (int)this.RateSlider.Maximum));
+        }
+
+        private void PitchText_KeyDown(object sender, KeyEventArgs e)
+        {
+
+            Util.SyncTextToSlider(this.PitchText, this.PitchSlider,
+                (int num) => Util.Clamp(num, (int)this.RateSlider.Minimum, (int)this.RateSlider.Maximum));
+        }
+
+        private void RateSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Util.SyncSliderToText(this.RateSlider, this.RateText);
+        }
+
+        private void PitchSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Util.SyncSliderToText(this.PitchSlider, this.PitchText);
         }
     }
 }

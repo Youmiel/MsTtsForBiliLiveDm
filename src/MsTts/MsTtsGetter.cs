@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MsTtsForBiliLiveDm.Utils;
+using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
@@ -14,14 +15,20 @@ namespace MsTtsForBiliLiveDm.MsTts
         private static readonly string AUTHORIIZATION = "bearer%20undefined";
 
         private string voiceType;
+        private int rate;
+        private int pitch;
 
         public string VoiceType { get => this.voiceType; set => this.voiceType = value; }
+        public int Rate { get => this.rate; set => this.rate = Util.Clamp(value, -100, 200); }
+        public int Pitch { get => this.pitch; set => this.pitch = Util.Clamp(value, -50, 50); }
 
         public MsTtsGetter() : this(MsVoiceType.XiaoxiaoNeural) { }
 
         public MsTtsGetter(string voiceType)
         {
             this.voiceType = voiceType;
+            this.rate = 0;
+            this.pitch = 0;
             this.AutoSetup();
         }
 
@@ -88,7 +95,7 @@ namespace MsTtsForBiliLiveDm.MsTts
             StringBuilder sb = CreateRequestHead("ssml", requestId, timestamp, "application/ssml+xml");
             string ssml = "<speak xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"http://www.w3.org/2001/mstts\" xmlns:emo=\"http://www.w3.org/2009/10/emotionml\" version=\"1.0\" xml:lang=\"en-US\">" +
                     "<voice name=\"" + this.voiceType + "\">" +
-                        "<prosody rate=\"0%\" pitch=\"0%\">" +
+                        "<prosody rate=\"" + this.rate + "%\" pitch=\"" + this.pitch + "%\">" +
                             ttsText +
                         "</prosody>" +
                     "</voice>" +

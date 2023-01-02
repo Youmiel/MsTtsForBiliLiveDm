@@ -80,6 +80,8 @@ namespace MsTtsForBiliLiveDm.Plugin
         {
             Util.DebugContent("Port: " + config.Port);
             Util.DebugContent("VoiceType: " + config.VoiceType);
+            Util.DebugContent("Rate: " + config.Rate);
+            Util.DebugContent("Pitch: " + config.Pitch);
 
             if (this.ttsHandler == null)
                 this.ttsHandler = new TtsHandler("", config.Port);
@@ -95,7 +97,10 @@ namespace MsTtsForBiliLiveDm.Plugin
                 }
             }
 
-            this.ttsHandler.TTSGetter.VoiceType = config.VoiceType;
+            MsTtsGetter ttsGetter = this.ttsHandler.TTSGetter;
+            ttsGetter.VoiceType = config.VoiceType;
+            ttsGetter.Rate = config.Rate;
+            ttsGetter.Pitch = config.Pitch;
         }
 
         public override void Admin()
