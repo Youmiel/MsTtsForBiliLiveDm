@@ -48,7 +48,7 @@ namespace MsTtsForBiliLiveDm.Plugin
             this.PluginAuth = "Youmiel";
             this.PluginName = "MsTtsPlugin";
             this.PluginCont = "youmiel@qq.com";
-            this.PluginVer = "1.0.0";
+            this.PluginVer = "1.0.1";
             this.PluginDesc = "微软TTS引擎";
 
             if (DISABLE) return;
@@ -155,6 +155,17 @@ namespace MsTtsForBiliLiveDm.Plugin
                 this.Log("Plugin started!");
             });
 
+        }
+
+        public override void DeInit()
+        {
+            CheckDisable();
+
+            if (this.ttsHandler == null)
+                return;
+
+            base.DeInit();
+            this.ttsHandler.Destory();
         }
     }
 }

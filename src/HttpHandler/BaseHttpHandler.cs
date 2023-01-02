@@ -108,6 +108,12 @@ namespace MsTtsForBiliDanmaku.HttpHandler
             oldThread.Join();
         }
 
+        public void Destory()
+        {
+            this.Stop();
+            this.httpListener.Close();
+        }
+
         //public async Task Stop()
         //{
         //    this.running = false;
