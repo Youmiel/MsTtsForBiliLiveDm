@@ -19,3 +19,8 @@ http://localhost:35468/?text=$TTSTEXT
 ## 注意事项
 
 目前插件的配置文件和弹幕姬本体保存在相同目录，弹幕姬自动升级时很有可能丢掉配置文件……和别的插件一样保存到 `Document/弹幕姬/` 当然可以做，但是为什么一定是 `Document` 呢？
+
+## //TODO
+
+- 连接Azure的非演示版本TTS服务
+- 提供一些别的TTS API，例如[偷懒工具](https://toolight.cn/media/reading)
