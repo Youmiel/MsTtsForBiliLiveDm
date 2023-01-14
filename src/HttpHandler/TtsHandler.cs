@@ -29,11 +29,20 @@ namespace MsTtsForBiliLiveDm.HttpHandler
             if (danmakuText != null)
             {
                 Util.DebugContent("Received text: " + danmakuText);
+                byte[] content = this.ttsGetter.GetTtsAudio(danmakuText, 3);
+                if (content != null)
+                {
+                    response.StatusCode = 200;
+                    response.ContentType = "audio/mpeg";
 
-                response.StatusCode = 200;
-                response.ContentType = "audio/mpeg";
-                byte[] content = this.ttsGetter.GetTtsAudio(danmakuText);
-                response.OutputStream.Write(content, 0, content.Length);
+                    response.OutputStream.Write(content, 0, content.Length);
+                    response.Close();
+                    return;
+                }
+                else
+                {
+                    response.StatusCode = 503;
+                }
             }
             else
             {

@@ -174,12 +174,28 @@ namespace MsTtsForBiliLiveDm.MsTts
             return data;
         }
 
-        public byte[] GetTtsAudio(string ttsText)
+        public byte[] GetTtsAudio(string ttsText, int retries)
         {
-            Task<byte[]> task = this.RequestTtsAudio(ttsText);
-            task.Wait();
+            for (int t = 0; t < retries; t++)
+            {
+                Task<byte[]> task;
+                try
+                {
+                    task = this.RequestTtsAudio(ttsText);
+                    task.Wait();
 
-            return task.Result;
+                    return task.Result;
+                }
+                catch (AggregateException ae)
+                {
+                    //Util.DebugContent(ae.InnerException.ToString());
+                    if (t < retries - 1)
+                        Util.LogContent($"Error occured when requesting audio, retrying... T={t + 1}");
+                    else
+                        Util.LogContent($"All retry attempts have failed.");
+                }
+            }
+            return null;
         }
     }
 }

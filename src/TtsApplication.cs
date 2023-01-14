@@ -3,11 +3,6 @@ using MsTtsForBiliLiveDm.MsTts;
 using MsTtsForBiliLiveDm.Plugin;
 using MsTtsForBiliLiveDm.Utils;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace MsTtsForBiliLiveDm
@@ -83,8 +78,10 @@ namespace MsTtsForBiliLiveDm
             _ = this.ttsHandler.Stop();
         }
 
+        //[DllExport("AppMain")]
         public static void Main()
         {
+            //Util.DebugContent = (string content) => { };
             Util.DebugContent = (string content) => Console.Out.WriteLine(content);
             Util.LogContent = (string content) => Console.Out.WriteLine(content);
 
