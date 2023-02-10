@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MsTtsForBiliLiveDm.Plugin;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -80,6 +81,23 @@ namespace MsTtsForBiliLiveDm.Utils
             {
                 text.Text = sliderValue.ToString();
             }
+        }
+
+        public static string DictToString<K,V>(Dictionary<K,V> map)
+        {
+            StringBuilder sb = new StringBuilder("{\n");
+            foreach(var entry in map)
+            {
+                sb.Append(entry.Key).Append(",").Append(entry.Value).Append("\n");
+            }
+            sb.Append("}");
+
+            return sb.ToString();
+        }
+
+        public static SerializablePair<TKey, TValue> ToSerializablePair<TKey, TValue>(KeyValuePair<TKey, TValue> pair)
+        {
+            return new SerializablePair<TKey, TValue> { Key = pair.Key, Value = pair.Value };
         }
     }
 }

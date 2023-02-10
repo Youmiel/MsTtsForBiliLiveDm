@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace MsTtsForBiliLiveDm
 {
-    public class TtsApplication : Application
+    public class TtsApplication : Application, IConfigurable
     {
         private PluginConfig config = null;
         private ConfigWindow configWindow = null;
@@ -21,8 +21,11 @@ namespace MsTtsForBiliLiveDm
             //{
             ConfigWindow cw = new ConfigWindow();
             cw.CloseBehaviour = CloseBehaviourEnum.CROSS_CLOSE;
-            cw.ConfigApplyAsync = (cfg) => this.ApplyConfig(cfg);
-
+            cw.ConfigApplyAsync = (cfg) =>
+            {
+                this.ApplyConfig(cfg);
+                PluginConfig.SaveConfig(PluginConfig.CONFIG_PATH, this.config);
+            };
             this.configWindow = cw;
             this.configWindow.BindConfig(this.config);
 
@@ -38,27 +41,22 @@ namespace MsTtsForBiliLiveDm
             return oldConfig;
         }
 
-        private void ApplyConfig(PluginConfig config)
+        public void ApplyConfig(PluginConfig config)
         {
             if (this.ttsHandler == null)
                 this.ttsHandler = new TtsHandler("", config.Port);
 
-            if (config.Port != this.ttsHandler.Port)
-            {
-                TtsHandler oldHandler = this.ttsHandler;
-                this.ttsHandler = new TtsHandler("", config.Port);
-                if (oldHandler.IsRunning)
-                {
-                    _ = oldHandler.Stop();
-                    this.ttsHandler.Start();
-                }
-            }
-            
-            MsTtsGetter ttsGetter = this.ttsHandler.TTSGetter;
-            ttsGetter.VoiceType = config.VoiceType;
-            ttsGetter.Rate = config.Rate;
-            ttsGetter.Pitch = config.Pitch;
+            this.ttsHandler.ApplyConfig(config);
         }
+
+        public void FetchConfig(PluginConfig config)
+        {
+            if (this.ttsHandler == null)
+                return;
+
+            this.ttsHandler.FetchConfig(config);
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -71,6 +69,9 @@ namespace MsTtsForBiliLiveDm
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
+
+            this.FetchConfig(this.config);
+            PluginConfig.SaveConfig(PluginConfig.CONFIG_PATH, this.config);
 
             if (this.ttsHandler == null)
                 return;

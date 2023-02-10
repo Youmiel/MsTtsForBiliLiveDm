@@ -14,7 +14,7 @@ using System.Windows;
 
 namespace MsTtsForBiliLiveDm.Plugin
 {
-    public class MsTtsPlugin : BilibiliDM_PluginFramework.DMPlugin
+    public class MsTtsPlugin : BilibiliDM_PluginFramework.DMPlugin, IConfigurable
     {
         private static readonly bool DISABLE = false;
 
@@ -76,7 +76,7 @@ namespace MsTtsForBiliLiveDm.Plugin
             return oldConfig;
         }
 
-        private void ApplyConfig(PluginConfig config)
+        public void ApplyConfig(PluginConfig config)
         {
             Util.DebugContent("Port: " + config.Port);
             Util.DebugContent("VoiceType: " + config.VoiceType);
@@ -86,26 +86,25 @@ namespace MsTtsForBiliLiveDm.Plugin
             if (this.ttsHandler == null)
                 this.ttsHandler = new TtsHandler("", config.Port);
 
-            if (config.Port != this.ttsHandler.Port)
-            {
-                TtsHandler oldHandler = this.ttsHandler;
-                this.ttsHandler = new TtsHandler("", config.Port);
-                if (oldHandler.IsRunning)
-                {
-                    _ = oldHandler.Stop();
-                    this.ttsHandler.Start();
-                }
-            }
+            this.ttsHandler.ApplyConfig(config);
+        }
 
-            MsTtsGetter ttsGetter = this.ttsHandler.TTSGetter;
-            ttsGetter.VoiceType = config.VoiceType;
-            ttsGetter.Rate = config.Rate;
-            ttsGetter.Pitch = config.Pitch;
+        public void FetchConfig(PluginConfig config)
+        {
+            if (this.ttsHandler == null)
+                return;
+
+            this.ttsHandler.FetchConfig(config);
         }
 
         public override void Admin()
         {
-            CheckDisable();
+            if (DISABLE)
+            {
+                MessageBox.Show("插件还在开发中");
+                return;
+            }
+            // CheckDisable();
 
             base.Admin();
 
@@ -115,7 +114,11 @@ namespace MsTtsForBiliLiveDm.Plugin
                 {
                     ConfigWindow cw = new ConfigWindow();
                     cw.CloseBehaviour = CloseBehaviourEnum.CLOSE;
-                    cw.ConfigApplyAsync = (cfg) => this.ApplyConfig(cfg);
+                    cw.ConfigApplyAsync = (cfg) =>
+                    {
+                        this.ApplyConfig(cfg); 
+                        PluginConfig.SaveConfig(PluginConfig.CONFIG_PATH, this.config);
+                    };
                     this.configWindow = cw;
                     this.configWindow.BindConfig(this.config);
 
@@ -134,7 +137,15 @@ namespace MsTtsForBiliLiveDm.Plugin
 
         public override void Stop()
         {
-            CheckDisable();
+            if (DISABLE)
+            {
+                MessageBox.Show("插件还在开发中");
+                return;
+            }
+            // CheckDisable();
+
+            this.FetchConfig(this.config);
+            PluginConfig.SaveConfig(PluginConfig.CONFIG_PATH, this.config);
 
             if (this.ttsHandler == null || !this.ttsHandler.IsRunning)
                 return;
@@ -147,7 +158,12 @@ namespace MsTtsForBiliLiveDm.Plugin
 
         public override void Start()
         {
-            CheckDisable();
+            if (DISABLE)
+            {
+                MessageBox.Show("插件还在开发中");
+                return;
+            }
+            // CheckDisable();
                 
             base.Start();
             //請勿使用任何阻塞方法
@@ -164,7 +180,15 @@ namespace MsTtsForBiliLiveDm.Plugin
 
         public override void DeInit()
         {
-            CheckDisable();
+            if (DISABLE)
+            {
+                MessageBox.Show("插件还在开发中");
+                return;
+            }
+            // CheckDisable();
+
+            this.FetchConfig(this.config);
+            PluginConfig.SaveConfig(PluginConfig.CONFIG_PATH, this.config);
 
             if (this.ttsHandler == null)
                 return;

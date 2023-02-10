@@ -1,5 +1,6 @@
 ﻿using MsTtsForBiliDanmaku.HttpHandler;
 using MsTtsForBiliLiveDm.MsTts;
+using MsTtsForBiliLiveDm.Plugin;
 using MsTtsForBiliLiveDm.Utils;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -9,7 +10,7 @@ using System.Web;
 
 namespace MsTtsForBiliLiveDm.HttpHandler
 {
-    public class TtsHandler : BaseHttpHandler
+    public class TtsHandler : BaseHttpHandler, IConfigurable
     {
         private MsTtsGetter ttsGetter;
 
@@ -29,7 +30,7 @@ namespace MsTtsForBiliLiveDm.HttpHandler
             if (danmakuText != null)
             {
                 Util.DebugContent("Received text: " + danmakuText);
-                byte[] content = this.ttsGetter.GetTtsAudio(danmakuText, 3);
+                byte[] content = this.ttsGetter.GetTtsAudio(danmakuText);
                 if (content != null)
                 {
                     response.StatusCode = 200;
@@ -49,6 +50,28 @@ namespace MsTtsForBiliLiveDm.HttpHandler
                 response.StatusCode = 400;
             }
             response.Close();
+        }
+
+        public void ApplyConfig(PluginConfig config)
+        {
+            if (config.Port != this.Port)
+            {
+                bool shouldRestart = this.IsRunning;
+
+                if (shouldRestart) { this.Stop(); }
+                this.port = config.Port;
+                this.SetupListener(this.contextRoot, this.port);
+                if (shouldRestart) { this.Start(); }
+
+                this.ttsGetter.ApplyConfig(config);
+            }
+        }
+
+        public void FetchConfig(PluginConfig config)
+        {
+            config.Port = this.port;
+
+            this.ttsGetter.FetchConfig(config);
         }
     }
 }

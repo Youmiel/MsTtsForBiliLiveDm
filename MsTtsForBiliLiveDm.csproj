@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{52089899-F1E5-41C5-9673-1B481C1BAB81}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MsTtsForBiliLiveDm</RootNamespace>
     <AssemblyName>MsTtsForBiliLiveDm</AssemblyName>
@@ -82,6 +82,9 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\HttpHandler\TtsHandler.cs" />
+    <Compile Include="src\MsTts\MsAPIProvider.cs" />
+    <Compile Include="src\Plugin\IConfigurable.cs" />
+    <Compile Include="src\Plugin\SerializablePair.cs" />
     <Compile Include="src\TtsApplication.cs" />
     <Compile Include="src\MsTts\MsTtsGetter.cs" />
     <Compile Include="src\MsTts\MsVoiceType.cs" />
