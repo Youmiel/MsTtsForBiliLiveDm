@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -52,6 +53,8 @@ namespace MsTtsForBiliLiveDm.Plugin
             this.PluginDesc = "微软TTS引擎";
 
             if (DISABLE) return;
+
+            Util.LogContent(Assembly.GetExecutingAssembly().Location);
 
             //Util.RunInSTAThread((ThreadStart)delegate
             //{

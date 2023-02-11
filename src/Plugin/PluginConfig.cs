@@ -108,8 +108,7 @@ namespace MsTtsForBiliLiveDm.Plugin
         public static void SaveConfig(string path, PluginConfig config)
         {
             XmlSerializer writer = new XmlSerializer(typeof(PluginConfig));
-            FileStream file = File.OpenWrite(path);
-            //FileStream file = File.Create(path);
+            FileStream file = File.Create(path);
             writer.Serialize(file, config);
             file.Close();
         }

@@ -1,0 +1,25 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
+
+namespace MsTtsForBiliLiveDm.MsTts
+{
+    public partial class MsVoiceType: IComparable<MsVoiceType>
+    {
+        //types
+
+        public static readonly SortedSet<MsVoiceType> ALL_VOICE = MsVoiceType.VoiceTypes();
+        private static SortedSet<MsVoiceType> VoiceTypes()
+        {
+            SortedSet<MsVoiceType> voiceSet = new SortedSet<MsVoiceType>
+            {
+                //fields
+            };
+
+            return voiceSet;
+        }
+    }
+}

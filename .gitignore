@@ -365,3 +365,4 @@ FodyWeavers.xsd
 # Custom
 /lib
 /README.txt
+/script/voice_type.json
