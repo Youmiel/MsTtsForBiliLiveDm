@@ -54,8 +54,6 @@ namespace MsTtsForBiliLiveDm.Plugin
 
             if (DISABLE) return;
 
-            Util.LogContent(Assembly.GetExecutingAssembly().Location);
-
             //Util.RunInSTAThread((ThreadStart)delegate
             //{
             //    ConfigWindow cw = new ConfigWindow();
