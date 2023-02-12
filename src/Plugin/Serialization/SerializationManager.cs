@@ -11,65 +11,49 @@ using System.Xml.Serialization;
 
 namespace MsTtsForBiliLiveDm.Plugin.Serialization
 {
-    public class SerializationResource<T> { 
-        private static string RESOURCE_PATH = Path.Combine(Assembly.GetExecutingAssembly().Location, "MsTtsPlugin");
-
-        private string path;
-        private T value;
-
-        public SerializationResource(string path)
-        {
-            this.path = path;
-            LoadResource();
-        }
-
-        private void LoadResource()
-        {
-        }
-    }
-    public class SerializationManager
+    public class SerializationResource<T> where T : new()
     {
-        private static PluginConfig config;
-        private static AccessRecord record;
+        private static string RESOURCE_DIR = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "MsTtsPlugin");
 
-        static PluginConfig Config => config;
-        static AccessRecord Record => record;
-
-        public void Save()
+        static SerializationResource()
         {
-            PluginConfig.SaveConfig(CONFIG_PATH, this);
-        }
-        public async void SaveAsync()
-        {
-            await Task.Run(delegate { this.Save(); });
+            if (!File.Exists(RESOURCE_DIR))
+                Directory.CreateDirectory(RESOURCE_DIR);
         }
 
-        public static PluginConfig CreateDefaultConfig()
+        private static void SaveResource(string fullpath, T value)
         {
-            PluginConfig newConfig = new PluginConfig();
-            newConfig.CopyValueOf(DEFAULT);
-            newConfig.Save();
-            return newConfig;
+
+            XmlSerializer writer = new XmlSerializer(typeof(T));
+            FileStream file = File.Create(fullpath);
+            writer.Serialize(file, value);
+            file.Close();
+        }
+        private static T CreateDefaultConfig(string fullpath)
+        {
+            T newObj = new T();
+            SaveResource(fullpath, newObj);
+            return newObj;
         }
 
-        public static PluginConfig LoadConfig(string path)
+        private static T LoadResource(string fullpath)
         {
             StreamReader file = null;
             try
             {
-                Util.DebugContent($"Loading config from {Path.GetFullPath(path)}");
-                if (File.Exists(path))
+                Util.DebugContent($"Loading resource from {Path.GetFullPath(fullpath)}");
+                if (File.Exists(fullpath))
                 {
-                    XmlSerializer reader = new XmlSerializer(typeof(PluginConfig));
-                    file = new StreamReader(path);
-                    PluginConfig config = (PluginConfig)reader.Deserialize(file);
+                    XmlSerializer reader = new XmlSerializer(typeof(T));
+                    file = new StreamReader(fullpath);
+                    T value = (T)reader.Deserialize(file);
                     file.Close();
-                    return config;
+                    return value;
                 }
                 else
                 {
                     Util.LogContent("Config not found. Creating new one...");
-                    return CreateDefaultConfig();
+                    return CreateDefaultConfig(fullpath);
                 }
             }
             catch (InvalidOperationException)
@@ -77,16 +61,42 @@ namespace MsTtsForBiliLiveDm.Plugin.Serialization
                 if (file != null)
                     file.Close();
                 Util.LogContent("Config load error. Creating new one...");
-                return CreateDefaultConfig();
+                return CreateDefaultConfig(fullpath);
             }
         }
 
-        public static void SaveConfig(string path, PluginConfig config)
+        private string path;
+        private T value;
+
+        public T Value => value;
+
+        public SerializationResource(string path)
         {
-            XmlSerializer writer = new XmlSerializer(typeof(PluginConfig));
-            FileStream file = File.Create(path);
-            writer.Serialize(file, config);
-            file.Close();
+            this.path = Path.Combine(RESOURCE_DIR, path);
+            this.value = LoadResource(this.path);
         }
+
+        public void Reload()
+        {
+            this.value = LoadResource(this.path);
+        }
+
+        public void Save()
+        {
+            SaveResource(this.path, this.value);
+        }
+
+        public async void SaveAsync()
+        {
+            await Task.Run(delegate { this.Save(); });
+        }
+    }
+    public class SerializationManager
+    {
+        private static SerializationResource<PluginConfig> config = new SerializationResource<PluginConfig>("config.xml");
+        private static SerializationResource<AccessRecord> record = new SerializationResource<AccessRecord>("record.xml");
+
+        public static SerializationResource<PluginConfig> Config => config;
+        public static SerializationResource<AccessRecord> Record => record;
     }
 }

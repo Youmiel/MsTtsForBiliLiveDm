@@ -16,7 +16,7 @@ namespace MsTtsForBiliLiveDm.Plugin.Serialization
         public AccessRecord()
         {
             this.MsAccessTime = DateTime.Now;
-            this.MsAccessCountDown = new List<SerializablePair<string, int>>(); //?
+            this.MsAccessCountDown = new List<SerializablePair<string, int>>();
             foreach (var entry in MsAPIProvider.DEFAULT_COUNT_DOWN_MAP)
                 this.MsAccessCountDown.Add(Util.ToSerializablePair(entry));
         }

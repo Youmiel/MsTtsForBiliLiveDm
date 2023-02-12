@@ -132,7 +132,7 @@ namespace MsTtsForBiliLiveDm.Plugin
                 this.config.VoiceType = (MsVoiceType)this.VoiceTypeBox.SelectedItem;
                 this.config.Rate = (int)this.RateSlider.Value;
                 this.config.Pitch = (int)this.PitchSlider.Value;
-                this.config.SaveAsync();
+                //this.config.SaveAsync();
             }
             if (this.configApplyAsync != null)
                 _ = Task.Run(delegate { this.configApplyAsync(this.config); });

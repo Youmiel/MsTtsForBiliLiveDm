@@ -1,4 +1,5 @@
 ﻿using MsTtsForBiliLiveDm.Plugin;
+using MsTtsForBiliLiveDm.Plugin.Serialization;
 using MsTtsForBiliLiveDm.Utils;
 using System;
 using System.Collections.Generic;
@@ -15,13 +16,15 @@ namespace MsTtsForBiliLiveDm.MsTts
         private static readonly string TRAFFIC_TYPE = "AzureDemo";
         private static readonly string AUTHORIIZATION = "bearer%20undefined";
         private static readonly int RETRY_INTERVAL = 1000;
-        private static readonly TimeSpan QUERY_INTERVAL = TimeSpan.FromSeconds(5.0);
+        private static readonly TimeSpan QUERY_INTERVAL = TimeSpan.FromSeconds(3.0);
+        private static readonly TimeSpan AUTO_SAVE_INTERVAL = TimeSpan.FromMinutes(1.0d);
 
         private MsVoiceType voiceType;
         private int rate;
         private int pitch;
         private MsAPIProvider apiProvider;
         private DateTime lastQueryTime;
+        private DateTime lastSaveTime;
 
         public MsVoiceType VoiceType { get => this.voiceType; set => this.voiceType = value; }
         public int Rate { get => this.rate; set => this.rate = Util.Clamp(value, -100, 200); }
@@ -35,11 +38,22 @@ namespace MsTtsForBiliLiveDm.MsTts
             this.rate = 0;
             this.pitch = 0;
             this.apiProvider = new MsAPIProvider();
-            this.lastQueryTime = DateTime.Now;
             this.AutoSetup();
         }
 
-        public void AutoSetup() { }
+        public void AutoSetup()
+        {
+            this.lastQueryTime = DateTime.Now;
+            this.lastSaveTime = DateTime.Now;
+            this.apiProvider.SetRecord(SerializationManager.Record.Value);
+        }
+
+        public void SaveQueryRecord()
+        {
+            Util.DebugContent("Auto saving record...");
+            this.apiProvider.GetRecord(SerializationManager.Record.Value);
+            SerializationManager.Record.SaveAsync();
+        }
 
         private async Task<ClientWebSocket> CreateConnection()
         {
@@ -193,10 +207,11 @@ namespace MsTtsForBiliLiveDm.MsTts
         {
             DateTime queryTime = DateTime.Now;
             if (queryTime.Subtract(this.lastQueryTime).CompareTo(QUERY_INTERVAL) < 0)
-                return new byte[0];
+                return null;
             // 下次一定重构
 
-            this.lastQueryTime = queryTime;
+            if (queryTime.Subtract(this.lastSaveTime).CompareTo(AUTO_SAVE_INTERVAL) < 0) { }
+                this.SaveQueryRecord();
 
             for (int t = 0; t < times; t++)
             {
@@ -206,6 +221,7 @@ namespace MsTtsForBiliLiveDm.MsTts
                     task = this.RequestTtsAudio(ttsText);
                     task.Wait();
 
+                    this.lastQueryTime = queryTime;
                     return task.Result;
                 }
                 catch (AggregateException ae)
@@ -221,6 +237,9 @@ namespace MsTtsForBiliLiveDm.MsTts
                 if (t < times - 1)
                     Thread.Sleep(RETRY_INTERVAL);
             }
+
+            this.apiProvider.ReduceLastAccess();
+
             return null;
         }
 
@@ -229,8 +248,6 @@ namespace MsTtsForBiliLiveDm.MsTts
             this.voiceType = config.VoiceType;
             this.rate = config.Rate;
             this.pitch = config.Pitch;
-
-            this.apiProvider.ApplyConfig(config);
         }
 
         public void FetchConfig(PluginConfig config)
@@ -238,8 +255,6 @@ namespace MsTtsForBiliLiveDm.MsTts
             config.VoiceType = this.voiceType;
             config.Rate = this.rate;
             config.Pitch = this.pitch;
-
-            this.apiProvider.FetchConfig(config);
         }
     }
 }

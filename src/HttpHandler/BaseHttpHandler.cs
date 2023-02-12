@@ -95,7 +95,7 @@ namespace MsTtsForBiliDanmaku.HttpHandler
             if (this.requestHandle != null) this.requestHandle(request, response);
         }
 
-        public Thread Stop()
+        public virtual Thread Stop()
         {
             Thread oldThread = this.listenThread;
             this.running = false;

@@ -7,9 +7,9 @@ using System.Xml.Serialization;
 
 namespace MsTtsForBiliLiveDm.MsTts
 {
-    public partial class MsVoiceType: IComparable<MsVoiceType>
+    public partial class MsVoiceType : IComparable<MsVoiceType>
     {
-        public static readonly MsVoiceType XiaoxiaoNeural = new MsVoiceType("晓晓","zh-CN-XiaoxiaoNeural");
+        public static readonly MsVoiceType XiaoxiaoNeural = new MsVoiceType("晓晓", "zh-CN-XiaoxiaoNeural");
         public static readonly MsVoiceType YunyangNeural = new MsVoiceType("云扬","zh-CN-YunyangNeural");
         public static readonly MsVoiceType XiaochenNeural = new MsVoiceType("晓辰","zh-CN-XiaochenNeural");
         public static readonly MsVoiceType XiaohanNeural = new MsVoiceType("晓涵","zh-CN-XiaohanNeural");

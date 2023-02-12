@@ -10,6 +10,9 @@ namespace MsTtsForBiliLiveDm.MsTts
     [XmlType("MsVoiceType"), XmlRoot("MsVoiceType")]
     public partial class MsVoiceType: IComparable<MsVoiceType>
     {
+        //private static int ID = 0;
+
+        //private int id;
         private string displayName;
         private string internalName;
 
@@ -20,6 +23,7 @@ namespace MsTtsForBiliLiveDm.MsTts
 
         public MsVoiceType(string displayName, string internalName)
         {
+            //this.id = ID++;
             this.displayName = displayName;
             this.internalName = internalName;
         }
@@ -42,6 +46,9 @@ namespace MsTtsForBiliLiveDm.MsTts
         public int CompareTo(MsVoiceType other)
         {
             return this.internalName.CompareTo(other.InternalName);
+            //if (this.Equals(other))
+            //    return 0;
+            //return this.id.CompareTo(other.id);
         }
     }
 }

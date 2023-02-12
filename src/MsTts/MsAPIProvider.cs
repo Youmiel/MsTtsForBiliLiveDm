@@ -1,4 +1,5 @@
 ﻿using MsTtsForBiliLiveDm.Plugin;
+using MsTtsForBiliLiveDm.Plugin.Serialization;
 using MsTtsForBiliLiveDm.Utils;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MsTtsForBiliLiveDm.MsTts
 {
-    public class MsAPIProvider: IConfigurable
+    public class MsAPIProvider: IRecord
     {
         private static readonly Random RANDOM = new Random();
         private static readonly string API_PREFIX = "wss://";
@@ -29,11 +30,13 @@ namespace MsTtsForBiliLiveDm.MsTts
              "eastasia"
         };
         private static readonly int MAX_COUNT = 50;
-        private static readonly TimeSpan REFREASH_HOUR = TimeSpan.FromHours(20.0d);
+        private static readonly int FAIL_PENALTY = 10;
+        private static readonly TimeSpan REFREASH_HOUR = TimeSpan.FromHours(16.0d);
         public static readonly Dictionary<string, int> DEFAULT_COUNT_DOWN_MAP = ConstructDefaultCountDownMap();
 
         private DateTime accessTime;
         private Dictionary<string, int> accessCountDown;
+        private string lastAccessKey = null;
 
         private static Dictionary<string, int> ConstructDefaultCountDownMap()
         {
@@ -68,6 +71,7 @@ namespace MsTtsForBiliLiveDm.MsTts
         public string ProvideUrl()
         {
             string name = this.getLocationName();
+            this.lastAccessKey = name;
 
             //Util.DebugContent(Util.DictToString<string, int>(this.accessCountDown));
             Util.DebugContent($"Using {name}");
@@ -77,27 +81,33 @@ namespace MsTtsForBiliLiveDm.MsTts
             return API_PREFIX + this.getLocationName() + API_POSTFIX;
         }
 
-        public void ApplyConfig(PluginConfig config)
+        public void ReduceLastAccess()
         {
-            if (this.accessTime.Subtract(config.AccessTime).CompareTo(REFREASH_HOUR) < 0)
+            if (lastAccessKey != null)
+                this.accessCountDown[this.lastAccessKey] -= FAIL_PENALTY;
+        }
+
+        public void SetRecord(AccessRecord record)
+        {
+            if (this.accessTime.Subtract(record.MsAccessTime).CompareTo(REFREASH_HOUR) < 0)
             {
-                this.accessTime = config.AccessTime;
-                foreach (var entry in config.AccessCountDown)
+                this.accessTime = record.MsAccessTime;
+                foreach (var entry in record.MsAccessCountDown)
                 {
                     int count = MAX_COUNT;
                     this.accessCountDown.TryGetValue(entry.Key, out count);
                     count = Math.Min(entry.Value, count);
-                    this.accessCountDown.Add(entry.Key, count);
+                    this.accessCountDown[entry.Key] = count;
                 }
             }
         }
 
-        public void FetchConfig(PluginConfig config)
+        public void GetRecord(AccessRecord record)
         {
-            config.AccessTime = this.accessTime;
-            config.AccessCountDown.Clear();
-            foreach(var entry in this.accessCountDown)
-                config.AccessCountDown.Add(Util.ToSerializablePair(entry));
+            record.MsAccessTime = this.accessTime;
+            record.MsAccessCountDown.Clear();
+            foreach (var entry in this.accessCountDown)
+                record.MsAccessCountDown.Add(Util.ToSerializablePair(entry));
         }
     }
 }

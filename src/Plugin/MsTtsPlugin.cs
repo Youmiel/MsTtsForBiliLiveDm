@@ -1,14 +1,6 @@
 ﻿using MsTtsForBiliLiveDm.HttpHandler;
-using MsTtsForBiliLiveDm.MsTts;
+using MsTtsForBiliLiveDm.Plugin.Serialization;
 using MsTtsForBiliLiveDm.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,7 +13,7 @@ namespace MsTtsForBiliLiveDm.Plugin
 
         private static readonly string REPOSITORY_LINK = "https://github.com/Youmiel/MsTtsForBiliLiveDm";
 
-        private PluginConfig config = null;
+        //private PluginConfig config = null;
         private ConfigWindow configWindow = null;
         private TtsHandler ttsHandler = null;
 
@@ -49,7 +41,7 @@ namespace MsTtsForBiliLiveDm.Plugin
             this.PluginAuth = "Youmiel";
             this.PluginName = "MsTtsPlugin";
             this.PluginCont = "youmiel@qq.com";
-            this.PluginVer = "1.1.1";
+            this.PluginVer = "1.2.1";
             this.PluginDesc = "微软TTS引擎";
 
             if (DISABLE) return;
@@ -64,18 +56,18 @@ namespace MsTtsForBiliLiveDm.Plugin
             //});
             this.Log($"你正在使用的是 {this.PluginVer} 版本的 {this.PluginName}, 项目仓库: {REPOSITORY_LINK}. 如果你遇到了任何使用问题, 欢迎前往反馈.");
 
-            this.LoadConfig();
+            //this.LoadConfig();
         }
 
-        public PluginConfig LoadConfig()
-        {
-            PluginConfig oldConfig = this.config;
-            this.config = PluginConfig.LoadConfig(PluginConfig.CONFIG_PATH);
+        //public PluginConfig LoadConfig()
+        //{
+        //    PluginConfig oldConfig = this.config;
+        //    this.config = PluginConfig.LoadConfig(PluginConfig.CONFIG_PATH);
 
-            //if (this.configWindow != null)
-            //    this.configWindow.BindConfig(this.config);
-            return oldConfig;
-        }
+        //    //if (this.configWindow != null)
+        //    //    this.configWindow.BindConfig(this.config);
+        //    return oldConfig;
+        //}
 
         public void ApplyConfig(PluginConfig config)
         {
@@ -117,11 +109,14 @@ namespace MsTtsForBiliLiveDm.Plugin
                     cw.CloseBehaviour = CloseBehaviourEnum.CLOSE;
                     cw.ConfigApplyAsync = (cfg) =>
                     {
-                        this.ApplyConfig(cfg); 
-                        PluginConfig.SaveConfig(PluginConfig.CONFIG_PATH, this.config);
+                        this.ApplyConfig(cfg);
+                        //SerializationManager.Config.Value.CopyValueOf(cfg);
+                        SerializationManager.Config.Save();
+                        //PluginConfig.SaveConfig(PluginConfig.CONFIG_PATH, this.config);
                     };
                     this.configWindow = cw;
-                    this.configWindow.BindConfig(this.config);
+                    this.configWindow.BindConfig(SerializationManager.Config.Value);
+                    //this.configWindow.BindConfig(this.config);
 
                     cw.ShowDialog();
 
@@ -145,8 +140,9 @@ namespace MsTtsForBiliLiveDm.Plugin
             }
             // CheckDisable();
 
-            this.FetchConfig(this.config);
-            PluginConfig.SaveConfig(PluginConfig.CONFIG_PATH, this.config);
+            this.FetchConfig(SerializationManager.Config.Value);
+            SerializationManager.Config.Save();
+            //PluginConfig.SaveConfig(PluginConfig.CONFIG_PATH, this.config);
 
             if (this.ttsHandler == null || !this.ttsHandler.IsRunning)
                 return;
@@ -169,10 +165,12 @@ namespace MsTtsForBiliLiveDm.Plugin
             base.Start();
             //請勿使用任何阻塞方法
 
-            this.LoadConfig();
+            //this.LoadConfig();
+            SerializationManager.Config.Reload();
             Task.Run(() =>
             {
-                this.ApplyConfig(this.config);
+                //this.ApplyConfig(this.config);
+                this.ApplyConfig(SerializationManager.Config.Value);
                 this.ttsHandler.Start();
                 this.Log("Plugin started!");
             });
@@ -188,8 +186,10 @@ namespace MsTtsForBiliLiveDm.Plugin
             }
             // CheckDisable();
 
-            this.FetchConfig(this.config);
-            PluginConfig.SaveConfig(PluginConfig.CONFIG_PATH, this.config);
+            //this.FetchConfig(this.config);
+            //PluginConfig.SaveConfig(PluginConfig.CONFIG_PATH, this.config);
+            this.FetchConfig(SerializationManager.Config.Value);
+            SerializationManager.Config.Save();
 
             if (this.ttsHandler == null)
                 return;

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Web;
 
 namespace MsTtsForBiliLiveDm.HttpHandler
@@ -33,6 +34,8 @@ namespace MsTtsForBiliLiveDm.HttpHandler
                 byte[] content = this.ttsGetter.GetTtsAudio(danmakuText);
                 if (content != null)
                 {
+                    if (content.Length == 0)
+                        Util.DebugContent("??");
                     response.StatusCode = 200;
                     response.ContentType = "audio/mpeg";
 
@@ -52,6 +55,12 @@ namespace MsTtsForBiliLiveDm.HttpHandler
             response.Close();
         }
 
+        public override Thread Stop()
+        {
+            this.TTSGetter.SaveQueryRecord();
+            return base.Stop();
+        }
+
         public void ApplyConfig(PluginConfig config)
         {
             if (config.Port != this.Port)
@@ -63,8 +72,8 @@ namespace MsTtsForBiliLiveDm.HttpHandler
                 this.SetupListener(this.contextRoot, this.port);
                 if (shouldRestart) { this.Start(); }
 
-                this.ttsGetter.ApplyConfig(config);
             }
+            this.ttsGetter.ApplyConfig(config);
         }
 
         public void FetchConfig(PluginConfig config)
