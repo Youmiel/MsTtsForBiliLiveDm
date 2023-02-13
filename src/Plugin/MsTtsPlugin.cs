@@ -41,7 +41,7 @@ namespace MsTtsForBiliLiveDm.Plugin
             this.PluginAuth = "Youmiel";
             this.PluginName = "MsTtsPlugin";
             this.PluginCont = "youmiel@qq.com";
-            this.PluginVer = "1.2.1";
+            this.PluginVer = "1.2.2";
             this.PluginDesc = "微软TTS引擎";
 
             if (DISABLE) return;
