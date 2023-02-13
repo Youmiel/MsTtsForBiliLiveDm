@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MsTtsForBiliLiveDm.MsTts
 {
-    public class MsTtsGetter: IConfigurable
+    public class MsTtsGetter : IConfigurable
     {
         //private static readonly string API_ADDRESS = "wss://eastus.api.speech.microsoft.com/cognitiveservices/websocket/v1";
         private static readonly string TRAFFIC_TYPE = "AzureDemo";
@@ -210,8 +210,11 @@ namespace MsTtsForBiliLiveDm.MsTts
                 return null;
             // 下次一定重构
 
-            if (queryTime.Subtract(this.lastSaveTime).CompareTo(AUTO_SAVE_INTERVAL) < 0) { }
+            if (queryTime.Subtract(this.lastSaveTime).CompareTo(AUTO_SAVE_INTERVAL) < 0)
+            {
                 this.SaveQueryRecord();
+                this.lastSaveTime = queryTime;
+            }
 
             for (int t = 0; t < times; t++)
             {
@@ -222,6 +225,8 @@ namespace MsTtsForBiliLiveDm.MsTts
                     task.Wait();
 
                     this.lastQueryTime = queryTime;
+                    if (task.Result.Length == 0)
+                        this.apiProvider.ReduceLastAccess();
                     return task.Result;
                 }
                 catch (AggregateException ae)
