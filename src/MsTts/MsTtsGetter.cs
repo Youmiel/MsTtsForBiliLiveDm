@@ -193,6 +193,10 @@ namespace MsTtsForBiliLiveDm.MsTts
         public async Task<byte[]> RequestTtsAudio(string ttsText)
         {
             ClientWebSocket connection = await this.CreateConnection();
+
+            if (connection == null)
+                return null;
+
             string requestId = Guid.NewGuid().ToString("N").ToUpper();
             string timestamp = DateTime.Now.ToUniversalTime().ToString("yyy-MM-dd'T'HH:mm:ss.fff'Z'");
             await this.SendSpeechConfig(connection, requestId, timestamp);
@@ -210,7 +214,7 @@ namespace MsTtsForBiliLiveDm.MsTts
                 return null;
             // 下次一定重构
 
-            if (queryTime.Subtract(this.lastSaveTime).CompareTo(AUTO_SAVE_INTERVAL) < 0)
+            if (queryTime.Subtract(this.lastSaveTime).CompareTo(AUTO_SAVE_INTERVAL) > 0)
             {
                 this.SaveQueryRecord();
                 this.lastSaveTime = queryTime;
@@ -225,7 +229,9 @@ namespace MsTtsForBiliLiveDm.MsTts
                     task.Wait();
 
                     this.lastQueryTime = queryTime;
-                    if (task.Result.Length == 0)
+                    if (task.Result == null)
+                        return null;
+                    else if (task.Result.Length == 0)
                         this.apiProvider.ReduceLastAccess();
                     return task.Result;
                 }
