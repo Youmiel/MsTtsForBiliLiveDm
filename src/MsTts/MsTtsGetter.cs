@@ -1,4 +1,6 @@
-﻿using MsTtsForBiliLiveDm.Utils;
+﻿using MsTtsForBiliLiveDm.Plugin;
+using MsTtsForBiliLiveDm.Plugin.Serialization;
+using MsTtsForBiliLiveDm.Utils;
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
@@ -8,44 +10,71 @@ using System.Threading.Tasks;
 
 namespace MsTtsForBiliLiveDm.MsTts
 {
-    public class MsTtsGetter
+    public class MsTtsGetter : IConfigurable
     {
-        private static readonly string API_ADDRESS = "wss://eastus.api.speech.microsoft.com/cognitiveservices/websocket/v1";
+        //private static readonly string API_ADDRESS = "wss://eastus.api.speech.microsoft.com/cognitiveservices/websocket/v1";
         private static readonly string TRAFFIC_TYPE = "AzureDemo";
         private static readonly string AUTHORIIZATION = "bearer%20undefined";
+        private static readonly int RETRY_INTERVAL = 1000;
+        private static readonly TimeSpan QUERY_INTERVAL = TimeSpan.FromSeconds(3.0);
+        private static readonly TimeSpan AUTO_SAVE_INTERVAL = TimeSpan.FromMinutes(1.0d);
 
-        private string voiceType;
+        private MsVoiceType voiceType;
         private int rate;
         private int pitch;
+        private MsAPIProvider apiProvider;
+        private DateTime lastQueryTime;
+        private DateTime lastSaveTime;
 
-        public string VoiceType { get => this.voiceType; set => this.voiceType = value; }
+        public MsVoiceType VoiceType { get => this.voiceType; set => this.voiceType = value; }
         public int Rate { get => this.rate; set => this.rate = Util.Clamp(value, -100, 200); }
         public int Pitch { get => this.pitch; set => this.pitch = Util.Clamp(value, -50, 50); }
 
         public MsTtsGetter() : this(MsVoiceType.XiaoxiaoNeural) { }
 
-        public MsTtsGetter(string voiceType)
+        public MsTtsGetter(MsVoiceType voiceType)
         {
             this.voiceType = voiceType;
             this.rate = 0;
             this.pitch = 0;
+            this.apiProvider = new MsAPIProvider();
             this.AutoSetup();
         }
 
-        public void AutoSetup() { }
+        public void AutoSetup()
+        {
+            this.lastQueryTime = DateTime.Now;
+            this.lastSaveTime = DateTime.Now;
+            this.apiProvider.SetRecord(SerializationManager.Record.Value);
+        }
+
+        public void SaveQueryRecord()
+        {
+            Util.DebugContent("Auto saving record...");
+            this.apiProvider.GetRecord(SerializationManager.Record.Value);
+            SerializationManager.Record.SaveAsync();
+        }
 
         private async Task<ClientWebSocket> CreateConnection()
         {
             string connectionId = Guid.NewGuid().ToString("N").ToUpper();
 
-            UriBuilder uriBuilder = new UriBuilder(API_ADDRESS);
+            string url = this.apiProvider.ProvideUrl();
+
+            if (url == null)
+            {
+                Util.LogContent("今日请求次数已达上限");
+                return null;
+            }
+
+            UriBuilder uriBuilder = new UriBuilder(url);
             uriBuilder.Query = String.Format("TrafficType={0}&Authorization={1}&X-ConnectionId={2}", TRAFFIC_TYPE, AUTHORIIZATION, connectionId);
 
             ClientWebSocket connection = new ClientWebSocket();
             //connection.Options.UseDefaultCredentials = true;
             //connection.Options.SetRequestHeader("Host", "eastus.api.speech.microsoft.com");
             connection.Options.SetRequestHeader("Origin", "https://azure.microsoft.com");
-            //connection.Options.SetRequestHeader("User-Agent", "Edg/108.0.1462.46");
+            //connection.Options.SetRequestHeader("User-Agent", "Edge/108.0.1462.46");  // cannot do this
             await connection.ConnectAsync(uriBuilder.Uri, CancellationToken.None);
             return connection;
         }
@@ -94,7 +123,7 @@ namespace MsTtsForBiliLiveDm.MsTts
         {
             StringBuilder sb = CreateRequestHead("ssml", requestId, timestamp, "application/ssml+xml");
             string ssml = "<speak xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"http://www.w3.org/2001/mstts\" xmlns:emo=\"http://www.w3.org/2009/10/emotionml\" version=\"1.0\" xml:lang=\"en-US\">" +
-                    "<voice name=\"" + this.voiceType + "\">" +
+                    "<voice name=\"" + this.voiceType.InternalName + "\">" +
                         "<prosody rate=\"" + this.rate + "%\" pitch=\"" + this.pitch + "%\">" +
                             ttsText +
                         "</prosody>" +
@@ -164,6 +193,10 @@ namespace MsTtsForBiliLiveDm.MsTts
         public async Task<byte[]> RequestTtsAudio(string ttsText)
         {
             ClientWebSocket connection = await this.CreateConnection();
+
+            if (connection == null)
+                return null;
+
             string requestId = Guid.NewGuid().ToString("N").ToUpper();
             string timestamp = DateTime.Now.ToUniversalTime().ToString("yyy-MM-dd'T'HH:mm:ss.fff'Z'");
             await this.SendSpeechConfig(connection, requestId, timestamp);
@@ -174,9 +207,20 @@ namespace MsTtsForBiliLiveDm.MsTts
             return data;
         }
 
-        public byte[] GetTtsAudio(string ttsText, int retries)
+        public byte[] GetTtsAudio(string ttsText, int times = 1)
         {
-            for (int t = 0; t < retries; t++)
+            DateTime queryTime = DateTime.Now;
+            if (queryTime.Subtract(this.lastQueryTime).CompareTo(QUERY_INTERVAL) < 0)
+                return null;
+            // 下次一定重构
+
+            if (queryTime.Subtract(this.lastSaveTime).CompareTo(AUTO_SAVE_INTERVAL) > 0)
+            {
+                this.SaveQueryRecord();
+                this.lastSaveTime = queryTime;
+            }
+
+            for (int t = 0; t < times; t++)
             {
                 Task<byte[]> task;
                 try
@@ -184,18 +228,44 @@ namespace MsTtsForBiliLiveDm.MsTts
                     task = this.RequestTtsAudio(ttsText);
                     task.Wait();
 
+                    this.lastQueryTime = queryTime;
+                    if (task.Result == null)
+                        return null;
+                    else if (task.Result.Length == 0)
+                        this.apiProvider.ReduceLastAccess();
                     return task.Result;
                 }
                 catch (AggregateException ae)
                 {
+                    Util.DebugContent(ae.ToString());
+                    //Util.DebugContent("");
                     //Util.DebugContent(ae.InnerException.ToString());
-                    if (t < retries - 1)
+                    if (t < times - 1)
                         Util.LogContent($"Error occured when requesting audio, retrying... T={t + 1}");
-                    else
+                    else if (times > 1)
                         Util.LogContent($"All retry attempts have failed.");
                 }
+                if (t < times - 1)
+                    Thread.Sleep(RETRY_INTERVAL);
             }
+
+            this.apiProvider.ReduceLastAccess();
+
             return null;
+        }
+
+        public void ApplyConfig(PluginConfig config)
+        {
+            this.voiceType = config.VoiceType;
+            this.rate = config.Rate;
+            this.pitch = config.Pitch;
+        }
+
+        public void FetchConfig(PluginConfig config)
+        {
+            config.VoiceType = this.voiceType;
+            config.Rate = this.rate;
+            config.Pitch = this.pitch;
         }
     }
 }

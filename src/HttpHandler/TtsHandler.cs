@@ -1,15 +1,17 @@
 ﻿using MsTtsForBiliDanmaku.HttpHandler;
 using MsTtsForBiliLiveDm.MsTts;
+using MsTtsForBiliLiveDm.Plugin;
 using MsTtsForBiliLiveDm.Utils;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Web;
 
 namespace MsTtsForBiliLiveDm.HttpHandler
 {
-    public class TtsHandler : BaseHttpHandler
+    public class TtsHandler : BaseHttpHandler, IConfigurable
     {
         private MsTtsGetter ttsGetter;
 
@@ -29,9 +31,11 @@ namespace MsTtsForBiliLiveDm.HttpHandler
             if (danmakuText != null)
             {
                 Util.DebugContent("Received text: " + danmakuText);
-                byte[] content = this.ttsGetter.GetTtsAudio(danmakuText, 3);
+                byte[] content = this.ttsGetter.GetTtsAudio(danmakuText);
                 if (content != null)
                 {
+                    if (content.Length == 0)
+                        Util.DebugContent("??");
                     response.StatusCode = 200;
                     response.ContentType = "audio/mpeg";
 
@@ -49,6 +53,34 @@ namespace MsTtsForBiliLiveDm.HttpHandler
                 response.StatusCode = 400;
             }
             response.Close();
+        }
+
+        public override Thread Stop()
+        {
+            this.TTSGetter.SaveQueryRecord();
+            return base.Stop();
+        }
+
+        public void ApplyConfig(PluginConfig config)
+        {
+            if (config.Port != this.Port)
+            {
+                bool shouldRestart = this.IsRunning;
+
+                if (shouldRestart) { this.Stop(); }
+                this.port = config.Port;
+                this.SetupListener(this.contextRoot, this.port);
+                if (shouldRestart) { this.Start(); }
+
+            }
+            this.ttsGetter.ApplyConfig(config);
+        }
+
+        public void FetchConfig(PluginConfig config)
+        {
+            config.Port = this.port;
+
+            this.ttsGetter.FetchConfig(config);
         }
     }
 }

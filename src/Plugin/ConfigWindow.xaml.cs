@@ -2,6 +2,7 @@
 using MsTtsForBiliLiveDm.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,9 +60,10 @@ namespace MsTtsForBiliLiveDm.Plugin
             this.closeBehaviour = CloseBehaviourEnum.CLOSE;
 
             this.VoiceTypeBox.Items.Clear();
-            List<string> voiceTypes = MsVoiceType.ALL_VOICE;
-            foreach (string v in voiceTypes)
+            ICollection<MsVoiceType> voiceTypes = MsVoiceType.ALL_VOICE;
+            foreach (MsVoiceType v in voiceTypes)
                 this.VoiceTypeBox.Items.Add(v);
+            this.VoiceTypeBox.SelectedIndex = 0;
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -127,10 +129,10 @@ namespace MsTtsForBiliLiveDm.Plugin
             if (this.config != null)
             {
                 this.config.Port = inputPort;
-                this.config.VoiceType = (string)this.VoiceTypeBox.SelectedItem;
+                this.config.VoiceType = (MsVoiceType)this.VoiceTypeBox.SelectedItem;
                 this.config.Rate = (int)this.RateSlider.Value;
                 this.config.Pitch = (int)this.PitchSlider.Value;
-                this.config.SaveAsync();
+                //this.config.SaveAsync();
             }
             if (this.configApplyAsync != null)
                 _ = Task.Run(delegate { this.configApplyAsync(this.config); });

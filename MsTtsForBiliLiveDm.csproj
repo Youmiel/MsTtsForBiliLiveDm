@@ -82,6 +82,13 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\HttpHandler\TtsHandler.cs" />
+    <Compile Include="src\MsTts\MsAPIProvider.cs" />
+    <Compile Include="src\MsTts\MsVoiceTypeExt.cs" />
+    <Compile Include="src\Plugin\Serialization\AccessRecord.cs" />
+    <Compile Include="src\Plugin\Serialization\IConfigurable.cs" />
+    <Compile Include="src\Plugin\Serialization\IRecord.cs" />
+    <Compile Include="src\Plugin\Serialization\SerializablePair.cs" />
+    <Compile Include="src\Plugin\Serialization\SerializationManager.cs" />
     <Compile Include="src\TtsApplication.cs" />
     <Compile Include="src\MsTts\MsTtsGetter.cs" />
     <Compile Include="src\MsTts\MsVoiceType.cs" />
@@ -89,7 +96,7 @@
     <Compile Include="src\Plugin\ConfigWindow.xaml.cs">
       <DependentUpon>ConfigWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="src\Plugin\PluginConfig.cs" />
+    <Compile Include="src\Plugin\Serialization\PluginConfig.cs" />
     <Compile Include="src\Test.cs" />
     <Compile Include="src\Utils\HttpUtil.cs" />
     <Compile Include="src\Utils\Util.cs" />

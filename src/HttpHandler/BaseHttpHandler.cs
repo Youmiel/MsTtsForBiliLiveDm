@@ -31,11 +31,18 @@ namespace MsTtsForBiliDanmaku.HttpHandler
 
         public BaseHttpHandler(string contextRoot, int port = 8080)
         {
-            this.httpListener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
             if (contextRoot.Length > 0 && !contextRoot.EndsWith("/"))
                 contextRoot += "/";
             this.port = port;
             this.contextRoot = contextRoot;
+
+            SetupListener(this.contextRoot, this.port);
+        }
+
+        protected void SetupListener(string contextRoot, int port)
+        {
+            this.httpListener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
+            this.httpListener.Prefixes.Clear();
             this.httpListener.Prefixes.Add(string.Format("http://localhost:{0}/{1}", port, contextRoot));
         }
 
@@ -88,7 +95,7 @@ namespace MsTtsForBiliDanmaku.HttpHandler
             if (this.requestHandle != null) this.requestHandle(request, response);
         }
 
-        public Thread Stop()
+        public virtual Thread Stop()
         {
             Thread oldThread = this.listenThread;
             this.running = false;
