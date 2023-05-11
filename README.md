@@ -1,5 +1,7 @@
 # MsTtsForBiliLiveDm
 
+**⚠微软TTS的网页演示j接口已被关闭，本仓库进行归档处理**
+
 为 [RE-TTSCat](https://github.com/Elepover/RE-TTSCat) 编写的自定义 TTS 引擎，提供简单的请求 API。
 
 ## 使用方法
