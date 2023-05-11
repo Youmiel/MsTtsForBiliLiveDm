@@ -5,25 +5,31 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MsTtsForBiliLiveDm.Plugin"
              mc:Ignorable="d" 
-             d:DesignWidth="320" d:DesignHeight="200">
-    <Grid>
+             d:DesignWidth="320" d:DesignHeight="200" Height="200" Width="320">
+    <Grid Height="NaN">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Label x:Name="UrlLabel" Content="Azure Token" Height="26" Margin="10,10,0,0" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5" RenderTransformOrigin="0.519,0.055" AutomationProperties.HelpText="" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <Label x:Name="VoiceTypeLabel" Content="语音" Height="26" Margin="10,73,0,0" Width="60" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-        <Label x:Name="MsgLabel" Content="*留空则使用Demo接口，请求次数受限" Height="26" Margin="10,36,0,0" VerticalContentAlignment="Center" Padding="5,5,5,5" RenderTransformOrigin="0.519,0.055" AutomationProperties.HelpText="" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <TextBlock x:Name="MsgText" Height="26" Margin="10,36,0,0" TextWrapping="Wrap" Padding="5,5,5,5" RenderTransformOrigin="0.519,0.055" AutomationProperties.HelpText="" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Run Text="*务必填写，Demo接口已被禁用 "/> 
+            <Hyperlink x:Name="HelpLink" Click="HelpLink_Click"> 
+                <Run Text="帮助"/> 
+            </Hyperlink>
+        </TextBlock>
+        <!-- <Label x:Name="MsgLabel" Content="*留空则使用Demo接口（已被禁用），请求次数受限" Height="26" Margin="10,36,0,0" VerticalContentAlignment="Center" Padding="5,5,5,5" RenderTransformOrigin="0.519,0.055" AutomationProperties.HelpText="" HorizontalAlignment="Left" VerticalAlignment="Top"/> -->
         <Label x:Name="RateLabel" Content="语速" Height="26" Margin="10,117,0,0" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <Label x:Name="PitchLabel" Content="语调" Height="26" Margin="10,161,0,0" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <Label x:Name="RateLabelPercent" Content="%" Height="26" Margin="105,117,0,0" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <Label x:Name="PitchLabelPercent" Content="%" Height="26" Margin="105,161,0,0" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
-        <TextBox x:Name="UrlText" Height="26" MaxLines="1" MaxLength="5" FontSize="14" Margin="130,10,0,0" VerticalContentAlignment="Center" KeyDown="PortText_KeyDown" TabIndex="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="180">
+        <TextBox x:Name="UrlText" Height="26" MaxLines="1" MaxLength="5" FontSize="14" Margin="130,10,0,0" VerticalContentAlignment="Center" TabIndex="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="180">
             <TextBox.Style>
                 <Style/>
             </TextBox.Style>
         </TextBox>
-        <ComboBox x:Name="VoiceTypeBox" Margin="90,73,0,0" Width="220" VerticalContentAlignment="Center" AutomationProperties.Name="" Text="" TabIndex="1" HorizontalAlignment="Left" VerticalAlignment="Top" Height="26">
+        <ComboBox x:Name="VoiceTypeBox" Margin="90,73,0,0" Width="220" AutomationProperties.Name="" Text="" TabIndex="1" HorizontalAlignment="Left" VerticalAlignment="Top" Height="26" VerticalContentAlignment="Center">
             <ComboBoxItem Content="&lt;无&gt;"/>
         </ComboBox>
         <TextBox x:Name="RateText" HorizontalAlignment="Left" Height="26" Margin="50,117,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="50" FontSize="14" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" MaxLines="1" MaxLength="4" KeyDown="RateText_KeyDown" Padding="5,0,5,0" TabIndex="2"/>

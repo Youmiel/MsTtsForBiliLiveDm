@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{52089899-F1E5-41C5-9673-1B481C1BAB81}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MsTtsForBiliLiveDm</RootNamespace>
     <AssemblyName>MsTtsForBiliLiveDm</AssemblyName>
@@ -47,8 +47,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
+    <StartupObject>MsTtsForBiliLiveDm.TtsApplication</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -84,6 +83,10 @@
     <Compile Include="src\HttpHandler\TtsHandler.cs" />
     <Compile Include="src\MsTts\MsAPIProvider.cs" />
     <Compile Include="src\MsTts\MsVoiceTypeExt.cs" />
+    <Compile Include="src\Plugin\IPluginConfigPanel.cs" />
+    <Compile Include="src\Plugin\MsTtsConfigPanel.xaml.cs">
+      <DependentUpon>MsTtsConfigPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="src\Plugin\Serialization\AccessRecord.cs" />
     <Compile Include="src\Plugin\Serialization\IConfigurable.cs" />
     <Compile Include="src\Plugin\Serialization\IRecord.cs" />
@@ -116,6 +119,10 @@
     <Page Include="src\Plugin\ConfigWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\Plugin\MsTtsConfigPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

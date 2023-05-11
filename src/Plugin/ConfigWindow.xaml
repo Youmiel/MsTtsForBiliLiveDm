@@ -4,19 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MsTtsForBiliLiveDm.Plugin"
-             mc:Ignorable="d" Width="400" Height="319" Background="#FFFCFCFC" HorizontalAlignment="Left" VerticalAlignment="Top" ResizeMode="NoResize">
-    <Grid HorizontalAlignment="Center" Width="400" Height="284" VerticalAlignment="Bottom">
+             mc:Ignorable="d" Background="#FFFCFCFC" HorizontalAlignment="Left" VerticalAlignment="Top" ResizeMode="NoResize" Width="400" SizeToContent="WidthAndHeight" d:DesignHeight="359.88">
+    <Grid HorizontalAlignment="Center" Width="400" VerticalAlignment="Bottom">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Label x:Name="PortLabel" Content="端口号" Height="26" Margin="50,38,290,220" Width="60" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5" RenderTransformOrigin="0.519,0.055"/>
-        <TextBox x:Name="PortText" Height="26" MaxLines="1" MaxLength="5" FontSize="14" Width="220" Margin="130,38,50,220" VerticalContentAlignment="Center" KeyDown="PortText_KeyDown" TabIndex="0">
+        <Label x:Name="PortLabel" Content="端口号" Height="26" Margin="50,38,290,220" Width="60" FontSize="14" VerticalContentAlignment="Center" Padding="0,5,0,5" RenderTransformOrigin="0.519,0.055" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <TextBox x:Name="PortText" Height="26" MaxLines="1" MaxLength="5" FontSize="14" Width="220" Margin="130,38,50,220" VerticalContentAlignment="Center" KeyDown="PortText_KeyDown" TabIndex="0" HorizontalAlignment="Left" VerticalAlignment="Top">
             <TextBox.Style>
                 <Style/>
             </TextBox.Style>
         </TextBox>
-        <GroupBox x:Name="ConfigBox" Header="GroupBox" Margin="35,78,35,78" Width="330">
-            <local:MsTtsConfigPanel></local:MsTtsConfigPanel>
+        <GroupBox x:Name="ConfigBox" Header="" Margin="35,78,35,78" Width="330">
+            <local:MsTtsConfigPanel Width="320"/>
         </GroupBox>
         <Button x:Name="SaveButton" Content="保存" Height="32" Margin="280,222,40,30" Width="80" Click="SaveButton_Click" FontSize="14" IsDefault="True" TabIndex="7" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
         <Button x:Name="CancelButton" Content="取消" Height="32" Margin="180,222,140,30" Width="80" Click="CancelButton_Click" FontSize="14" IsCancel="True" TabIndex="6" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>

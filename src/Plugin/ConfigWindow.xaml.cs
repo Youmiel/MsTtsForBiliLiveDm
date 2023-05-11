@@ -18,7 +18,7 @@ using System.Windows.Shapes;
 
 namespace MsTtsForBiliLiveDm.Plugin
 {
-    public partial class ConfigWindow
+    public partial class ConfigWindow : IPluginConfigPanel
     {
         public delegate void ConfigApplyAction(PluginConfig config);
 
@@ -29,8 +29,7 @@ namespace MsTtsForBiliLiveDm.Plugin
         public CloseBehaviourEnum CloseBehaviour
         {
             get => this.closeBehaviour;
-            set
-            {
+            set { 
                 this.closeBehaviour = value;
                 if (this.closeBehaviour == CloseBehaviourEnum.NONE || this.closeBehaviour == CloseBehaviourEnum.CROSS_CLOSE)
                 {
@@ -51,6 +50,8 @@ namespace MsTtsForBiliLiveDm.Plugin
             }
         }
         public ConfigApplyAction ConfigApplyAsync { get => this.configApplyAsync; set => this.configApplyAsync = value; }
+        public double RequiredPanelHeight => this.Height;
+
 
         public ConfigWindow()
         {
@@ -58,12 +59,6 @@ namespace MsTtsForBiliLiveDm.Plugin
 
             //this.config = new PluginConfig();
             this.closeBehaviour = CloseBehaviourEnum.CLOSE;
-
-            this.VoiceTypeBox.Items.Clear();
-            ICollection<MsVoiceType> voiceTypes = MsVoiceType.ALL_VOICE;
-            foreach (MsVoiceType v in voiceTypes)
-                this.VoiceTypeBox.Items.Add(v);
-            this.VoiceTypeBox.SelectedIndex = 0;
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -118,21 +113,18 @@ namespace MsTtsForBiliLiveDm.Plugin
         public void UpdateWithConfig(PluginConfig config)
         {
             this.PortText.Text = config.Port.ToString();
-            this.VoiceTypeBox.SelectedItem = config.VoiceType;
-            this.RateSlider.Value = config.Rate;
-            this.PitchSlider.Value = config.Pitch;
+
+            // TODO
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            int inputPort = int.Parse(this.PortText.Text);
             if (this.config != null)
             {
-                this.config.Port = inputPort;
-                this.config.VoiceType = (MsVoiceType)this.VoiceTypeBox.SelectedItem;
-                this.config.Rate = (int)this.RateSlider.Value;
-                this.config.Pitch = (int)this.PitchSlider.Value;
+                this.ApplyToConfig(this.config);
                 //this.config.SaveAsync();
+
+                // TODO
             }
             if (this.configApplyAsync != null)
                 _ = Task.Run(delegate { this.configApplyAsync(this.config); });
@@ -150,27 +142,10 @@ namespace MsTtsForBiliLiveDm.Plugin
             Util.LimitKeyToNumbers(sender, e);
         }
 
-        private void RateText_KeyDown(object sender, KeyEventArgs e)
+        public void ApplyToConfig(PluginConfig config)
         {
-            Util.SyncTextToSlider(this.RateText, this.RateSlider,
-                (int num) => Util.Clamp(num, (int)this.RateSlider.Minimum, (int)this.RateSlider.Maximum));
-        }
-
-        private void PitchText_KeyDown(object sender, KeyEventArgs e)
-        {
-
-            Util.SyncTextToSlider(this.PitchText, this.PitchSlider,
-                (int num) => Util.Clamp(num, (int)this.RateSlider.Minimum, (int)this.RateSlider.Maximum));
-        }
-
-        private void RateSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            Util.SyncSliderToText(this.RateSlider, this.RateText);
-        }
-
-        private void PitchSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            Util.SyncSliderToText(this.PitchSlider, this.PitchText);
+            int inputPort = int.Parse(this.PortText.Text);
+            this.config.Port = inputPort;
         }
     }
 }
